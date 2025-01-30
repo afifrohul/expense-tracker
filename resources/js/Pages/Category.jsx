@@ -1,14 +1,24 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
 import 'datatables.net-dt/css/dataTables.dataTables.min.css'
 import { MdAdd, MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
 import toast from 'react-hot-toast';
 import { BiLoaderCircle } from 'react-icons/bi';
 import Swal from 'sweetalert2';
+import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill, RiArrowLeftSLine , RiArrowRightSLine } from "react-icons/ri";
+import { useDebounce } from 'use-debounce';
 
-export default function Category({ auth, category }) {
-    const [data, setData] = useState(category);
+export default function Category({ auth }) {
+    const [data, setData] = useState([]);
+
+    const [search, setSearch] = useState(null)
+    const [debounceSearch] = useDebounce(search, 500);
+    const [perPage, setPerPage] = useState(10)
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(null)
+
+
     const [showModal, setShowModal] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -23,6 +33,13 @@ export default function Category({ auth, category }) {
         setTimeout(() => setIsVisible(true), 50);
     }
 
+    const handleShowEditModal = (item) => {
+        setIsEditing(true);
+        setEditData(item);
+        setName(item.name);
+        handleShowModal();
+    };
+
     const handleCloseModal = () => {
         setIsVisible(false);
         setTimeout(() => {
@@ -32,6 +49,47 @@ export default function Category({ auth, category }) {
             setEditData(null);
         }, 150); 
     };
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('/category/create', {
+                name: name,
+            });
+
+            if (response.status === 201) {
+                fetchData();
+                handleCloseModal(); 
+                toast.success(response.data.message)
+            } else {
+                toast.error("There was an error", response);
+            }
+
+        } catch (error) {
+            toast.error("There was an error", error);
+        }
+        
+    };
+
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.put(`/category/update/${editData.id}`, {
+                name: name,
+            });
+
+            if (response.status === 201) {
+                fetchData();
+                handleCloseModal();
+                toast.success(response.data.message);
+
+            }
+            
+        } catch (error) {
+            toast.error("Error updating field data!", error);
+        }
+    }
 
     const handleDelete = async (item) => {
 
@@ -56,10 +114,7 @@ export default function Category({ auth, category }) {
             const response = await axios.delete(`/category/delete/${item.id}`);
     
             if (response.status === 201) {
-                const updatedData = response.data.category;
-    
-                setData(updatedData);
-    
+                fetchData();
                 toast.success('Data berhasil dihapus.');
             }
         } catch (error) {
@@ -67,72 +122,32 @@ export default function Category({ auth, category }) {
         }
     }
 
-    const handleSave = async (e) => {
-        e.preventDefault();
-
-        try {
-            const response = await axios.post('/category/create', {
-                name: name,
-            });
-
-            if (response.status === 201) {
-                const newData = response.data.category;
-        
-                // Update state
-                setData(prevDatas => [
-                    ...prevDatas,
-                    {
-                        id: newData.id,
-                        name: newData.name,
-                        transactions: newData.transactions || []
-                    }
-                ]);
-    
-                // Close the modal after saving
-                handleCloseModal(); 
-                toast.success(response.data.message)
-            } else {
-                toast.error("There was an error", response);
-            }
-
-        } catch (error) {
-            toast.error("There was an error", error);
-        }
-        
+    const handlePagination = (page) => {
+        setPage(page);
     };
 
-    const handleEdit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.put(`/category/update/${editData.id}`, {
-                name: name,
+    const fetchData = () => {
+        axios
+            .get('/category/data', {
+                params: {
+                    search,
+                    page,
+                    perPage,
+                }
+            })
+            .then(response => {
+                setData(response.data.data);
+                setTotalPages(response.data.last_page)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
-
-            if (response.status === 201) {
-                const updatedData = response.data.category
-
-                setData(prevDatas => 
-                    prevDatas.map(item =>
-                        item.id === updatedData.id ? updatedData : item
-                    )
-                )
-
-                handleCloseModal();
-                toast.success(response.data.message);
-
-            }
-            
-        } catch (error) {
-            toast.error("Error updating field data!", error);
-        }
-    }
-
-    const handleShowEditModal = (item) => {
-        setIsEditing(true);
-        setEditData(item);
-        setName(item.name);
-        handleShowModal();
     };
+
+    useEffect(() => {
+        fetchData();
+    }, [debounceSearch, page, perPage]);
+
 
     return (
         <AuthenticatedLayout
@@ -147,6 +162,37 @@ export default function Category({ auth, category }) {
                         </div>
                 </div>
                 <hr className='mb-4'/>
+                <div className='flex gap-4'>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="gl" className="block text-gray-700 text-sm mb-2">
+                            Tampilan per halaman
+                        </label>
+                        <select
+                            id="perPage"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            value={perPage}
+                            onChange={e => setPerPage(e.target.value)}
+                            >
+                            <option value="10" >10</option>
+                            <option value="25" >25</option>
+                            <option value="50" >50</option>
+                            <option value="100" >100</option>
+                        </select>
+                    </div>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="search" className="block text-gray-700 text-sm mb-2">
+                            Cari berdasarkan nama kategori
+                        </label>
+                        <input
+                            id="search"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            placeholder="Masukkan kategori"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        >
+                        </input>
+                    </div>
+                </div>
                 <table className=" divide-y divide-gray-200 w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -199,6 +245,37 @@ export default function Category({ auth, category }) {
                         ))}
                     </tbody>
                 </table>
+                {
+                    data.length == 0 ? (
+                        <p className='text-center py-2 text-gray-500'>Tidak ada data tersedia</p>
+                    ) : null
+                }
+
+                <div className='w-full justify-end flex gap-4 items-center mx-auto pt-3 border-t-2'>
+                    <button disabled={page === 1} onClick={() => handlePagination(1)}>
+                        <div className=''>
+                            <RiArrowLeftDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === 1} onClick={() => handlePagination(page - 1)}>
+                        <div className=''>
+                            <RiArrowLeftSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <div>
+                        <p className='font-semibold px-2 text-sm text-gray-600'>{page}/{totalPages}</p>
+                    </div>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(page + 1)}>
+                        <div className=''>
+                            <RiArrowRightSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(totalPages)}>
+                        <div className=''>
+                            <RiArrowRightDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                </div>
 
 
             </div>

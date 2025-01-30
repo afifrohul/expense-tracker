@@ -33,11 +33,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/daily-expenses', [DashboardController::class, 'getDailyExpenses']);
     
     Route::get('/category', [CategoryController::class, 'index'])->name('category');
+    Route::get('/category/data', [CategoryController::class, 'data']);
     Route::post('/category/create', [CategoryController::class, 'store']);
     Route::put('/category/update/{id}', [CategoryController::class, 'update']);
     Route::delete('/category/delete/{id}', [CategoryController::class, 'destroy']);
 
     Route::get('/transaction', [TransactionController::class, 'index'])->name('transaction');
+    Route::get('/transaction/data', [TransactionController::class, 'data']);
     Route::post('/transaction/create', [TransactionController::class, 'store']);
     Route::put('/transaction/update/{id}', [TransactionController::class, 'update']);
     Route::delete('/transaction/delete/{id}', [TransactionController::class, 'destroy']);

@@ -10,10 +10,24 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $category = Category::with('transactions')->get();
         return Inertia::render('Category', [
-            'category' => $category
+            // 
         ]);
+    }
+
+    public function data(Request $request)
+    {
+        $search = $request->input('search', null);
+        $perPage = $request->input('perPage', 10);
+    
+        $category = Category::with(['transactions'])
+        ->when($search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%");
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage);
+           
+        return response()->json($category);
     }
 
     public function store(Request $request)

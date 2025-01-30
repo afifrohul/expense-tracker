@@ -1,14 +1,23 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import React, { useState, useEffect, useRef } from 'react';
+import { Head } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
 import { MdAdd, MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
 import toast from 'react-hot-toast';
 import { BiLoaderCircle } from 'react-icons/bi';
 import Swal from 'sweetalert2';
 import { formatRupiah } from './utils';
+import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill, RiArrowLeftSLine , RiArrowRightSLine } from "react-icons/ri";
+import { useDebounce } from 'use-debounce';
 
-export default function Transaction({ auth, transaction, all_category }) {
-    const [data, setData] = useState(transaction);
+export default function Transaction({ auth, all_category }) {
+    const [data, setData] = useState([]);
+
+    const [search, setSearch] = useState(null)
+    const [debounceSearch] = useDebounce(search, 500);
+    const [perPage, setPerPage] = useState(10)
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(null)
+
     const [showModal, setShowModal] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -27,6 +36,17 @@ export default function Transaction({ auth, transaction, all_category }) {
         setTimeout(() => setIsVisible(true), 50);
     }
 
+    const handleShowEditModal = (item) => {
+        setIsEditing(true);
+        setEditData(item);
+        setDescription(item.description);
+        setCategory(item.category_id);
+        setType(item.type);
+        setAmount(item.amount);
+        setDate(item.date);
+        handleShowModal();
+    };
+
     const handleCloseModal = () => {
         setIsVisible(false);
         setTimeout(() => {
@@ -41,40 +61,6 @@ export default function Transaction({ auth, transaction, all_category }) {
         }, 150); 
     };
 
-    const handleDelete = async (item) => {
-
-        setLoadingDelete(item.id);
-
-        const { isConfirmed } = await Swal.fire({
-            title: 'Konfirmasi',
-            text: "Apakah Anda yakin ingin menghapus data ini?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus data',
-            cancelButtonText: 'Batal'
-        });
-    
-        if (!isConfirmed) {
-                setLoadingDelete(null);
-                return;
-            }
-
-    
-        try {
-            const response = await axios.delete(`/transaction/delete/${item.id}`);
-    
-            if (response.status === 201) {
-                const updatedData = response.data.transaction;
-    
-                setData(updatedData);
-    
-                toast.success('Data berhasil dihapus.');
-            }
-        } catch (error) {
-            toast.error("Gagal menghapus data!", error);
-        }
-    }
-
     const handleSave = async (e) => {
         e.preventDefault();
 
@@ -88,22 +74,7 @@ export default function Transaction({ auth, transaction, all_category }) {
             });
 
             if (response.status === 201) {
-                const newData = response.data.transaction;
-        
-                // Update state
-                setData(prevDatas => [
-                    ...prevDatas,
-                    {
-                        id: newData.id,
-                        description: newData.description,
-                        category: newData.category,
-                        type: newData.type,
-                        amount: newData.amount,
-                        date: newData.date,
-                    }
-                ]);
-    
-                // Close the modal after saving
+                fetchData()
                 handleCloseModal(); 
                 toast.success(response.data.message)
             } else {
@@ -128,14 +99,7 @@ export default function Transaction({ auth, transaction, all_category }) {
             });
 
             if (response.status === 201) {
-                const updatedData = response.data.transaction
-
-                setData(prevDatas => 
-                    prevDatas.map(item =>
-                        item.id === updatedData.id ? updatedData : item
-                    )
-                )
-
+                fetchData()
                 handleCloseModal();
                 toast.success(response.data.message);
 
@@ -146,16 +110,61 @@ export default function Transaction({ auth, transaction, all_category }) {
         }
     }
 
-    const handleShowEditModal = (item) => {
-        setIsEditing(true);
-        setEditData(item);
-        setDescription(item.description);
-        setCategory(item.category_id);
-        setType(item.type);
-        setAmount(item.amount);
-        setDate(item.date);
-        handleShowModal();
+    const handleDelete = async (item) => {
+
+        setLoadingDelete(item.id);
+
+        const { isConfirmed } = await Swal.fire({
+            title: 'Konfirmasi',
+            text: "Apakah Anda yakin ingin menghapus data ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus data',
+            cancelButtonText: 'Batal'
+        });
+    
+        if (!isConfirmed) {
+                setLoadingDelete(null);
+                return;
+            }
+
+        try {
+            const response = await axios.delete(`/transaction/delete/${item.id}`);
+    
+            if (response.status === 201) {
+                fetchData()
+                toast.success('Data berhasil dihapus.');
+            }
+        } catch (error) {
+            toast.error("Gagal menghapus data!", error);
+        }
+    }
+
+    const handlePagination = (page) => {
+        setPage(page);
     };
+
+    const fetchData = () => {
+        axios
+            .get('/transaction/data', {
+                params: {
+                    search,
+                    page,
+                    perPage,
+                }
+            })
+            .then(response => {
+                setData(response.data.data);
+                setTotalPages(response.data.last_page)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [debounceSearch, page, perPage]);
 
     return (
         <AuthenticatedLayout
@@ -165,11 +174,42 @@ export default function Transaction({ auth, transaction, all_category }) {
             <div className='bg-white rounded-lg border border-slate-300 p-4 text-sm'>
                 <div className='flex justify-between items-center'>
                     <h1 className='font-bold text-lg my-4'>Daftar Transaksi</h1>
-                        <div className='bg-blue-500 rounded px-3 py-2 text-white hover:bg-blue-600 duration-150 hover:cursor-pointer' onClick={handleShowModal}>
-                            <MdAdd className='inline'/> Tambah
-                        </div>
+                    <div className='bg-blue-500 rounded px-3 py-2 text-white hover:bg-blue-600 duration-150 hover:cursor-pointer' onClick={handleShowModal}>
+                        <MdAdd className='inline'/> Tambah
+                    </div>
                 </div>
                 <hr className='mb-4'/>
+                <div className='flex gap-4'>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="gl" className="block text-gray-700 text-sm mb-2">
+                            Tampilan per halaman
+                        </label>
+                        <select
+                            id="perPage"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            value={perPage}
+                            onChange={e => setPerPage(e.target.value)}
+                            >
+                            <option value="10" >10</option>
+                            <option value="25" >25</option>
+                            <option value="50" >50</option>
+                            <option value="100" >100</option>
+                        </select>
+                    </div>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="search" className="block text-gray-700 text-sm mb-2">
+                            Cari berdasarkan deskripsi
+                        </label>
+                        <input
+                            id="search"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            placeholder="Masukkan deskripsi"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        >
+                        </input>
+                    </div>
+                </div>
                 <table className=" divide-y divide-gray-200 w-full">
                     <thead className="bg-gray-50">
                         <tr>
@@ -244,6 +284,37 @@ export default function Transaction({ auth, transaction, all_category }) {
                         ))}
                     </tbody>
                 </table>
+                {
+                    data.length == 0 ? (
+                        <p className='text-center py-2 text-gray-500'>Tidak ada data tersedia</p>
+                    ) : null
+                }
+
+                <div className='w-full justify-end flex gap-4 items-center mx-auto pt-3 border-t-2'>
+                    <button disabled={page === 1} onClick={() => handlePagination(1)}>
+                        <div className=''>
+                            <RiArrowLeftDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === 1} onClick={() => handlePagination(page - 1)}>
+                        <div className=''>
+                            <RiArrowLeftSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <div>
+                        <p className='font-semibold px-2 text-sm text-gray-600'>{page}/{totalPages}</p>
+                    </div>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(page + 1)}>
+                        <div className=''>
+                            <RiArrowRightSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(totalPages)}>
+                        <div className=''>
+                            <RiArrowRightDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                </div>
 
 
             </div>

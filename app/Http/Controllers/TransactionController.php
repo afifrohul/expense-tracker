@@ -14,9 +14,23 @@ class TransactionController extends Controller
         $transaction = Transaction::with('category')->orderBy('date', 'desc')->get();
         $category = Category::get();
         return Inertia::render('Transaction', [
-            'transaction' => $transaction,
             'all_category' => $category
         ]);
+    }
+
+    public function data(Request $request)
+    {
+        $search = $request->input('search', null);
+        $perPage = $request->input('perPage', 10);
+    
+        $transaction = Transaction::with(['category'])
+        ->when($search, function ($query, $search) {
+            $query->where('description', 'like', "%{$search}%");
+        })
+        ->orderBy('date', 'desc')
+        ->paginate($perPage);
+           
+        return response()->json($transaction);
     }
 
     public function store(Request $request)

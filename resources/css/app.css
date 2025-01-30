@@ -1,0 +1,296 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.layout-topbar {
+    position: fixed;
+    height: 5rem;
+    z-index: 997;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0 2rem;
+    background-color: white;
+    transition: left .2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, .02), 0 0 2px rgba(0, 0, 0, .05), 0 1px 4px rgba(0, 0, 0, .08);
+}
+
+.layout-sidebar {
+    position: fixed;
+    width: 250px;
+    height: calc(100vh - 9rem);
+    z-index: 998;
+    overflow-y: auto;
+    top: 7rem;
+    transition: transform .2s, left .2s;
+    background-color: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, .02), 0 0 2px rgba(0, 0, 0, .05), 0 1px 4px rgba(0, 0, 0, .08);
+}
+
+.layout-main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* justify-content: space-between; */
+    /* padding: 7rem 2rem 2rem 4rem; */
+    padding-top: 7rem;
+    padding-bottom: 2rem;
+    padding-right: 2rem;
+    transition: margin-left .2s;
+}
+
+
+.fc-daygrid-event-dot {
+    display: none;
+}
+
+.fc-daygrid-event {
+    padding-left: 0 !important;
+}
+
+.slate, .gray, .zinc, .neutral, .stone, .red, .orange, .amber, .yellow, .lime, .green, .emerald, .teal, .cyan, .sky, .blue, .indigo, .violet, .purple, .fuchsia, .pink, .rose {
+    font-style: italic !important;
+    color: #ffffff !important;
+    transition: background-color 0.3s !important;
+} 
+
+
+/* Slate */
+.slate {
+    background-color: #64748b !important; /* Level 500 */
+    border-color: #64748b !important;
+}
+
+.slate:hover {
+    background-color: #475569 !important; /* Level 600 */
+}
+
+/* Gray */
+.gray {
+    background-color: #6b7280 !important; /* Level 500 */
+    border-color: #6b7280 !important;
+}
+
+.gray:hover {
+    background-color: #4b5563 !important; /* Level 600 */
+}
+
+/* Zinc */
+.zinc {
+    background-color: #71717a !important; /* Level 500 */
+    color: #ffffff !important;
+    transition: background-color 0.3s !important;
+    border-color: #71717a !important;
+}
+
+.zinc:hover {
+    background-color: #52525b !important; /* Level 600 */
+}
+
+/* Neutral */
+.neutral {
+    background-color: #737373 !important; /* Level 500 */
+    border-color: #737373 !important;
+}
+
+.neutral:hover {
+    background-color: #525252 !important; /* Level 600 */
+}
+
+/* Stone */
+.stone {
+    background-color: #78716c !important; /* Level 500 */
+    border-color: #78716c !important;
+}
+
+.stone:hover {
+    background-color: #57534e !important; /* Level 600 */
+}
+
+/* Red */
+.red {
+    background-color: #ef4444 !important; /* Level 500 */
+    border-color: #ef4444 !important;
+}
+
+.red:hover {
+    background-color: #dc2626 !important; /* Level 600 */
+}
+
+/* Orange */
+.orange {
+    background-color: #f97316 !important; /* Level 500 */
+    border-color: #f97316 !important;
+}
+
+.orange:hover {
+    background-color: #ea580c !important; /* Level 600 */
+}
+
+/* Amber */
+.amber {
+    background-color: #f59e0b !important; /* Level 500 */
+    border-color: #f59e0b !important;
+}
+
+.amber:hover {
+    background-color: #d97706 !important; /* Level 600 */
+}
+
+/* Yellow */
+.yellow {
+    background-color: #eab308 !important; /* Level 500 */
+    border-color: #eab308 !important;
+}
+
+.yellow:hover {
+    background-color: #ca8a04 !important; /* Level 600 */
+}
+
+/* Lime */
+.lime {
+    background-color: #84cc16 !important; /* Level 500 */
+    border-color: #84cc16 !important;
+}
+
+.lime:hover {
+    background-color: #65a30d !important; /* Level 600 */
+}
+
+/* Green */
+.green {
+    background-color: #22c55e !important; /* Level 500 */
+    border-color: #22c55e !important;
+}
+
+.green:hover {
+    background-color: #16a34a !important; /* Level 600 */
+}
+
+/* Emerald */
+.emerald {
+    background-color: #10b981 !important; /* Level 500 */
+    border-color: #10b981 !important;
+}
+
+.emerald:hover {
+    background-color: #059669 !important; /* Level 600 */
+}
+
+/* Teal */
+.teal {
+    background-color: #14b8a6 !important; /* Level 500 */
+    border-color: #14b8a6 !important;
+}
+
+.teal:hover {
+    background-color: #0d9488 !important; /* Level 600 */
+}
+
+/* Cyan */
+.cyan {
+    background-color: #06b6d4 !important; /* Level 500 */
+    border-color: #06b6d4 !important;
+}
+
+.cyan:hover {
+    background-color: #0891b2 !important; /* Level 600 */
+}
+
+/* Sky */
+.sky {
+    background-color: #0ea5e9 !important; /* Level 500 */
+    border-color: #0ea5e9 !important;
+}
+
+.sky:hover {
+    background-color: #0284c7 !important; /* Level 600 */
+}
+
+/* Blue */
+.blue {
+    background-color: #3b82f6 !important; /* Level 500 */
+    border-color: #3b82f6 !important;
+}
+
+.blue:hover {
+    background-color: #2563eb !important; /* Level 600 */
+}
+
+/* Indigo */
+.indigo {
+    background-color: #6366f1 !important; /* Level 500 */
+    border-color: #6366f1 !important;
+}
+
+.indigo:hover {
+    background-color: #4f46e5 !important; /* Level 600 */
+}
+
+/* Violet */
+.violet {
+    background-color: #8b5cf6 !important; /* Level 500 */
+    border-color: #8b5cf6 !important;
+}
+
+.violet:hover {
+    background-color: #7c3aed !important; /* Level 600 */
+}
+
+/* Purple */
+.purple {
+    background-color: #a855f7 !important; /* Level 500 */
+    border-color: #a855f7 !important;
+}
+
+.purple:hover {
+    background-color: #9333ea !important; /* Level 600 */
+}
+
+/* Fuchsia */
+.fuchsia {
+    background-color: #d946ef !important; /* Level 500 */
+    border-color: #d946ef !important;
+}
+
+.fuchsia:hover {
+    background-color: #c026d3 !important; /* Level 600 */
+}
+
+/* Pink */
+.pink {
+    background-color: #ec4899 !important; /* Level 500 */
+    border-color: #ec4899 !important;
+}
+
+.pink:hover {
+    background-color: #db2777 !important; /* Level 600 */
+}
+
+/* Rose */
+.rose {
+    background-color: #f43f5e !important; /* Level 500 */
+    border-color: #f43f5e !important;
+}
+
+.rose:hover {
+    background-color: #e11d48 !important; /* Level 600 */
+}
+
+
+div.dt-container div.dt-layout-row select.dt-input {
+    padding-right: 2.5rem;
+}
+
+#headIndex, #index, #headNumerical, #numerical {
+    text-align: left;
+}
+
+div.dt-container {
+    overflow: scroll;
+}

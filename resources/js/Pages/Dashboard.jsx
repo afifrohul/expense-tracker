@@ -2,9 +2,6 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 import { DateTime } from 'luxon';
-import DataTable from 'datatables.net-react';
-import DT from 'datatables.net-dt';
-import 'datatables.net-dt/css/dataTables.dataTables.min.css'
 import { formatRupiah } from './utils';
 import { LuWallet } from "react-icons/lu";
 import { BiCoinStack } from "react-icons/bi";
@@ -83,9 +80,6 @@ export default function Dashboard({ auth, total_income, total_expense, total_bal
     
     const maxExpenseEx = Math.max(...chartDataEx.map(d => d.expense), 0);
     const maxYAxisEx = roundToNearest(Math.max(maxExpenseEx));
-    
-
-    DataTable.use(DT);
 
     return (
         <AuthenticatedLayout

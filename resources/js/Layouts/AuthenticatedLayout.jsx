@@ -2,9 +2,9 @@ import { useState } from 'react';
 import Dropdown from '@/Components/Dropdown';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { Toaster } from 'react-hot-toast';
 import { MdOutlineSpaceDashboard, MdOutlineMenu, MdOutlineCategory } from "react-icons/md";
 import { GrTransaction } from "react-icons/gr";
+import { Toaster } from 'sonner';
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -20,24 +20,7 @@ export default function Authenticated({ user, header, children }) {
 
     return (
         <div className="min-h-screen">
-            <Toaster 
-                toastOptions={{
-                    success: {
-                        duration: 700,
-                        style: {
-                            backgroundColor: '#bbf7d0',
-                            color: '#15803d',
-                        }
-                    },
-                    error: {
-                        duration: 700,
-                        style: {
-                            backgroundColor: '#fecaca',
-                            color: '#ef4444',
-                        }
-                    },
-                }}
-            />
+            <Toaster position="top-right" richColors/>
             <div className="layout-topbar">
                 <div className=" mx-auto w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">

@@ -2,12 +2,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
 import { MdAdd, MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
-import toast from 'react-hot-toast';
 import { BiLoaderCircle } from 'react-icons/bi';
 import Swal from 'sweetalert2';
 import { formatRupiah } from './utils';
 import { useDebounce } from 'use-debounce';
 import DataTable from "react-data-table-component";
+import { toast } from 'sonner';
 
 export default function Transaction({ auth, all_category }) {
 
@@ -81,11 +81,11 @@ export default function Transaction({ auth, all_category }) {
                 handleCloseModal(); 
                 toast.success(response.data.message)
             } else {
-                toast.error("There was an error", response);
+                toast.error("There was an error" + response);
             }
 
         } catch (error) {
-            toast.error("There was an error", error);
+            toast.error("There was an error" + error);
         }
         
     };
@@ -109,7 +109,7 @@ export default function Transaction({ auth, all_category }) {
             }
             
         } catch (error) {
-            toast.error("Error updating field data!", error);
+            toast.error("Error updating field data!" + error);
         }
     }
 
@@ -139,7 +139,7 @@ export default function Transaction({ auth, all_category }) {
                 toast.success('Data berhasil dihapus.');
             }
         } catch (error) {
-            toast.error("Gagal menghapus data!", error);
+            toast.error("Gagal menghapus data!" + error);
         }
     }
 

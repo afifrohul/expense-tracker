@@ -1,13 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
-import 'datatables.net-dt/css/dataTables.dataTables.min.css'
 import { MdAdd, MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
-import toast from 'react-hot-toast';
 import { BiLoaderCircle } from 'react-icons/bi';
 import Swal from 'sweetalert2';
 import { useDebounce } from 'use-debounce';
 import DataTable from "react-data-table-component";
+import { toast } from 'sonner';
 
 export default function Category({ auth }) {
 
@@ -63,13 +62,13 @@ export default function Category({ auth }) {
             if (response.status === 201) {
                 fetchData();
                 handleCloseModal(); 
-                toast.success(response.data.message)
+                toast.success(response.data.message);
             } else {
-                toast.error("There was an error", response);
+                toast.error("There was an error" + response);
             }
 
         } catch (error) {
-            toast.error("There was an error", error);
+            toast.error("There was an error" + error);
         }
         
     };
@@ -89,7 +88,7 @@ export default function Category({ auth }) {
             }
             
         } catch (error) {
-            toast.error("Error updating field data!", error);
+            toast.error("Error updating field data!" + error);
         }
     }
 
@@ -120,7 +119,7 @@ export default function Category({ auth }) {
                 toast.success('Data berhasil dihapus.');
             }
         } catch (error) {
-            toast.error("Gagal menghapus data!", error);
+            toast.error("Gagal menghapus data!" + error);
         }
     }
 

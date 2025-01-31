@@ -18,16 +18,28 @@ class CategoryController extends Controller
     public function data(Request $request)
     {
         $search = $request->input('search', null);
-        $perPage = $request->input('perPage', 10);
-    
-        $category = Category::with(['transactions'])
-        ->when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%");
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate($perPage);
-           
-        return response()->json($category);
+        $perPage = max((int) $request->input('perPage', 10), 1); 
+        $sortField = $request->input('sort', 'created_at');
+        $sortOrder = $request->input('order', 'desc'); 
+
+        $allowedSortFields = ['id', 'name', 'created_at'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'created_at';
+        }
+
+        $category = Category::withCount('transactions')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($perPage);
+
+        return response()->json([
+            'data' => $category->items(),
+            'total' => $category->total(),
+            'per_page' => $category->perPage(),
+            'current_page' => $category->currentPage(),
+        ]);
     }
 
     public function store(Request $request)

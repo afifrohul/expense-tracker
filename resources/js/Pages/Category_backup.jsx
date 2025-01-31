@@ -6,20 +6,18 @@ import { MdAdd, MdDeleteForever, MdOutlineEditNote } from "react-icons/md";
 import toast from 'react-hot-toast';
 import { BiLoaderCircle } from 'react-icons/bi';
 import Swal from 'sweetalert2';
+import { RiArrowLeftDoubleFill, RiArrowRightDoubleFill, RiArrowLeftSLine , RiArrowRightSLine } from "react-icons/ri";
 import { useDebounce } from 'use-debounce';
-import DataTable from "react-data-table-component";
 
 export default function Category({ auth }) {
-
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [totalRows, setTotalRows] = useState(0);
-    const [perPage, setPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [search, setSearch] = useState("");
+
+    const [search, setSearch] = useState(null)
     const [debounceSearch] = useDebounce(search, 500);
-    const [sortField, setSortField] = useState("created_at");
-    const [sortOrder, setSortOrder] = useState("desc");
+    const [perPage, setPerPage] = useState(10)
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(null)
+
 
     const [showModal, setShowModal] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -124,97 +122,31 @@ export default function Category({ auth }) {
         }
     }
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get("/category/data", {
-                params: { 
-                    search, 
-                    perPage, 
-                    page: currentPage, 
-                    sort: sortField, 
-                    order: sortOrder 
-                },
-            });
+    const handlePagination = (page) => {
+        setPage(page);
+    };
 
-            setData(response.data.data);
-            setTotalRows(response.data.total);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-        setLoading(false);
+    const fetchData = () => {
+        axios
+            .get('/category/data', {
+                params: {
+                    search,
+                    page,
+                    perPage,
+                }
+            })
+            .then(response => {
+                setData(response.data.data);
+                setTotalPages(response.data.last_page)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
     };
 
     useEffect(() => {
         fetchData();
-    }, [currentPage, perPage, debounceSearch, sortField, sortOrder]);
-
-    const customStyles = {
-        headCells: {
-            style: {
-                backgroundColor: "#F9FAFB",
-            },
-        },
-    };
-
-    const columns = [
-        {
-            name: (
-                <div
-                    scope="col"
-                    className=" text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                    No
-                </div>
-            ),
-            cell: (row, index) => (currentPage - 1) * perPage + index + 1,
-            sortable: false,
-        },
-        { name: (
-            <div
-                scope="col"
-                className=" text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-                Nama Kategori
-            </div>
-        ), selector: row => row.name, sortable: true },
-        { 
-            name: (
-                <div
-                    scope="col"
-                    className=" text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                    Aksi
-                </div>
-            ), 
-            cell: row =>
-                <div className='flex gap-2'>
-                    <div className='flex gap-1'>
-                        <div className='p-2 w-fit rounded text-white bg-yellow-500 hover:bg-yellow-600 duration-150 hover:cursor-pointer' onClick={() => handleShowEditModal(row)}>
-                            <MdOutlineEditNote className='text-2xl'/>
-                        </div>
-                    </div>
-                    {
-                        row.transactions_count == 0 ? (
-                        <div className='flex gap-1'>
-                            <div
-                                className={`p-2 w-fit rounded text-white ${
-                                    loadingDelete === row.id ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600 hover:cursor-pointer'
-                                } duration-150`}
-                                onClick={loadingDelete === row.id ? null : () => handleDelete(row)}
-                                >
-                                    <p>{loadingDelete === row.id ? (
-                                        <BiLoaderCircle className='text-2xl'/>
-                                    ) : (
-                                        <MdDeleteForever className='text-2xl'/>
-                                    )}</p>
-                            </div>
-                        </div>
-                        ) : null
-                    }
-                </div>
-        },
-    ];
+    }, [debounceSearch, page, perPage]);
 
 
     return (
@@ -229,39 +161,122 @@ export default function Category({ auth }) {
                             <MdAdd className='inline'/> Tambah
                         </div>
                 </div>
-                <hr className='mt-2 mb-5'/>
-
-                <div className="text-end">
-                    <label htmlFor="">Search: </label>
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="mb-3 p-1.5 border rounded text-sm"
-                    />
-
-                    <hr />
-
-                    {/* DataTable */}
-                    <DataTable
-                        columns={columns}
-                        data={data}
-                        customStyles={customStyles}
-                        progressPending={loading}
-                        progressComponent={<BiLoaderCircle className='m-6 text-xl'/>}
-                        pagination
-                        paginationServer
-                        paginationTotalRows={totalRows}
-                        onChangePage={setCurrentPage}
-                        onChangeRowsPerPage={setPerPage}
-                        onSort={(column, sortDirection) => {
-                            const field = typeof column.selector === "function" ? column.selector({}) : column.selector;
-                            setSortField(field);
-                            setSortOrder(sortDirection);
-                        }}
-                    />
+                <hr className='mb-4'/>
+                <div className='flex gap-4'>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="gl" className="block text-gray-700 text-sm mb-2">
+                            Tampilan per halaman
+                        </label>
+                        <select
+                            id="perPage"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            value={perPage}
+                            onChange={e => setPerPage(e.target.value)}
+                            >
+                            <option value="10" >10</option>
+                            <option value="25" >25</option>
+                            <option value="50" >50</option>
+                            <option value="100" >100</option>
+                        </select>
+                    </div>
+                    <div className='w-full mb-4'>
+                        <label htmlFor="search" className="block text-gray-700 text-sm mb-2">
+                            Cari berdasarkan nama kategori
+                        </label>
+                        <input
+                            id="search"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-gray-500 text-sm"
+                            placeholder="Masukkan kategori"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        >
+                        </input>
+                    </div>
                 </div>
+                <table className=" divide-y divide-gray-200 w-full">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th scope="col" id='headIndex' className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                No
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Kategori
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Opsi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {data.map((item, index) => (
+                            <tr key={index}>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-900" id='index'>{index + 1}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <div className="text-sm text-gray-900">{item.name}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2 justify-center">
+                                    <div className='flex gap-1'>
+                                        <div className='p-2 w-fit rounded text-white bg-yellow-500 hover:bg-yellow-600 duration-150 hover:cursor-pointer' onClick={() => handleShowEditModal(item)}>
+                                            <MdOutlineEditNote className='text-2xl'/>
+                                        </div>
+                                    </div>
+                                    {
+                                        Array.isArray(item.transactions) && item.transactions.length === 0 ? (
+                                        <div className='flex gap-1'>
+                                            <div
+                                                className={`p-2 w-fit rounded text-white ${
+                                                    loadingDelete === item.id ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600 hover:cursor-pointer'
+                                                } duration-150`}
+                                                onClick={loadingDelete === item.id ? null : () => handleDelete(item)}
+                                                >
+                                                    <p>{loadingDelete === item.id ? (
+                                                        <BiLoaderCircle className='text-2xl'/>
+                                                    ) : (
+                                                        <MdDeleteForever className='text-2xl'/>
+                                                    )}</p>
+                                            </div>
+                                        </div>
+                                        ) : null
+                                    }
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {
+                    data.length == 0 ? (
+                        <p className='text-center py-2 text-gray-500'>Tidak ada data tersedia</p>
+                    ) : null
+                }
+
+                <div className='w-full justify-end flex gap-4 items-center mx-auto pt-3 border-t-2'>
+                    <button disabled={page === 1} onClick={() => handlePagination(1)}>
+                        <div className=''>
+                            <RiArrowLeftDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === 1} onClick={() => handlePagination(page - 1)}>
+                        <div className=''>
+                            <RiArrowLeftSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <div>
+                        <p className='font-semibold px-2 text-sm text-gray-600'>{page}/{totalPages}</p>
+                    </div>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(page + 1)}>
+                        <div className=''>
+                            <RiArrowRightSLine className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                    <button disabled={page === totalPages} onClick={() => handlePagination(totalPages)}>
+                        <div className=''>
+                            <RiArrowRightDoubleFill className='text-xl text-gray-400' />
+                        </div>
+                    </button>
+                </div>
+
 
             </div>
             {showModal && (

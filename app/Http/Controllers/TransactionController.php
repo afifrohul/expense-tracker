@@ -21,16 +21,28 @@ class TransactionController extends Controller
     public function data(Request $request)
     {
         $search = $request->input('search', null);
-        $perPage = $request->input('perPage', 10);
-    
-        $transaction = Transaction::with(['category'])
-        ->when($search, function ($query, $search) {
-            $query->where('description', 'like', "%{$search}%");
-        })
-        ->orderBy('date', 'desc')
-        ->paginate($perPage);
-           
-        return response()->json($transaction);
+        $perPage = max((int) $request->input('perPage', 10), 1);
+        $sortField = $request->input('sort', 'date'); 
+        $sortOrder = $request->input('order', 'desc'); 
+
+        $allowedSortFields = ['id', 'description', 'date', 'amount', 'type'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'date';
+        }
+
+        $transaction = Transaction::with('category')
+            ->when($search, function ($query, $search) {
+                $query->where('description', 'like', "%{$search}%");
+            })
+            ->orderBy($sortField, $sortOrder)
+            ->paginate($perPage);
+
+        return response()->json([
+            'data' => $transaction->items(),
+            'total' => $transaction->total(),
+            'per_page' => $transaction->perPage(),
+            'current_page' => $transaction->currentPage(),
+        ]);
     }
 
     public function store(Request $request)

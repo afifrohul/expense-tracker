@@ -23,11 +23,6 @@ export default function Dashboard({ auth, total_income, total_expense, total_bal
     // const [year, setYear] = useState(2024);
     const [chartData, setChartData] = useState([]);
     
-    const [ex_month, setExMonth] = useState(new Date().getMonth() + 1); 
-    const [ex_year, setExYear] = useState(new Date().getFullYear());
-    // const [ex_year, setExYear] = useState(2024);
-    const [chartDataEx, setChartDataEx] = useState([]);
-    
 
     useEffect(() => {
         const intervalId = setInterval(() => {
@@ -57,20 +52,7 @@ export default function Dashboard({ auth, total_income, total_expense, total_bal
         fetchData();
     }, [year]);
 
-    useEffect(() => {
-        const fetchExpenses = async (month, year) => {
-            try {
-                const response = await axios.get(`/api/daily-expenses?month=${ex_month}&year=${ex_year}`);
-                setChartDataEx(response.data)
-            } catch (error) {
-                console.error("Error fetching data", error);
-            }
-        };
-        fetchExpenses();
-    }, [ex_month, ex_year]);
 
-
-    
     const roundToNearest = (value, base = 100000) => Math.ceil(value / base) * base;
 
     const maxIncome = Math.max(...chartData.map(d => d.income), 0);
@@ -78,8 +60,6 @@ export default function Dashboard({ auth, total_income, total_expense, total_bal
     
     const maxYAxis = roundToNearest(Math.max(maxIncome, maxExpense));
     
-    const maxExpenseEx = Math.max(...chartDataEx.map(d => d.expense), 0);
-    const maxYAxisEx = roundToNearest(Math.max(maxExpenseEx));
 
     return (
         <AuthenticatedLayout
@@ -243,52 +223,6 @@ export default function Dashboard({ auth, total_income, total_expense, total_bal
                                 ))}
                             </div>
                         </div>
-                    </div>
-
-                    <div className='border border-slate-300 p-4 rounded-lg w-full'>
-                        <div className='mb-2'>
-                            <p className='font-bold text-lg'>Data pengeluaran per hari</p>
-                            <hr className='mt-2'/>
-                        </div>
-                        <div className='flex gap-4'>
-                            <div className='w-full'>
-                                <select
-                                    id="ex_month"
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-blue-700"
-                                    value={ex_month}
-                                    onChange={e => setExMonth(e.target.value)}
-                                >
-                                    {Array.from({ length: 12 }, (_, i) => (
-                                        <option key={i + 1} value={i + 1}>
-                                            {new Date(0, i).toLocaleString("id-ID", { month: "long" })}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className='w-full'>
-                                <select
-                                    id="ex_year"
-                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring-blue-700"
-                                    value={ex_year}
-                                    onChange={e => setExYear(e.target.value)}
-                                >
-                                    {all_years.map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {item.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <ResponsiveContainer width="100%" height={400} className='p-3 w-full'>
-                            <LineChart data={chartDataEx}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" tickFormatter={(date) => new Date(date).getDate()} />
-                                <YAxis domain={[0, maxYAxisEx]}/>
-                                <Tooltip />
-                                <Line type="monotone" dataKey="expense" stroke="#8884d8" strokeWidth={2} />
-                            </LineChart>
-                        </ResponsiveContainer>
                     </div>
 
                 </div>                

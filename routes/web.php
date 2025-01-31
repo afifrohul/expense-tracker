@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\AnalyticController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,19 +31,24 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/api/transactions/summary', [DashboardController::class, 'getAnnualSummary']);
-    Route::get('/api/daily-expenses', [DashboardController::class, 'getDailyExpenses']);
+
     
     Route::get('/category', [CategoryController::class, 'index'])->name('category');
     Route::get('/category/data', [CategoryController::class, 'data']);
     Route::post('/category/create', [CategoryController::class, 'store']);
     Route::put('/category/update/{id}', [CategoryController::class, 'update']);
     Route::delete('/category/delete/{id}', [CategoryController::class, 'destroy']);
-
+    
     Route::get('/transaction', [TransactionController::class, 'index'])->name('transaction');
     Route::get('/transaction/data', [TransactionController::class, 'data']);
     Route::post('/transaction/create', [TransactionController::class, 'store']);
     Route::put('/transaction/update/{id}', [TransactionController::class, 'update']);
     Route::delete('/transaction/delete/{id}', [TransactionController::class, 'destroy']);
+    
+    Route::get('/analytic', [AnalyticController::class, 'index'])->name('analytic');
+    Route::get('/api/daily-expenses', [AnalyticController::class, 'getDailyExpenses']);
+    Route::get('/api/expenses-by-category', [AnalyticController::class, 'getExpenseByCategory']);
+    Route::get('/api/year-summary', [AnalyticController::class, 'getYearlySummary']);
 });
 
 require __DIR__.'/auth.php';

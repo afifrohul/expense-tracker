@@ -103,34 +103,6 @@ class DashboardController extends Controller
         return response()->json($result);
     }
 
-    public function getDailyExpenses(Request $request)
-    {
-        $month = $request->input('month', now()->month);
-        $year = $request->input('year', now()->year);
-
-        // Hitung jumlah hari dalam bulan yang dipilih
-        $daysInMonth = Carbon::create($year, $month, 1)->daysInMonth;
-
-        // Ambil transaksi pengeluaran harian
-        $expenses = DB::table('transactions')
-            ->selectRaw('DAY(date) as day, SUM(amount) as total_expense')
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->where('type', 'expense') // Sesuaikan dengan field yang menandakan pengeluaran
-            ->groupBy('day')
-            ->orderBy('day')
-            ->get();
-
-        // Buat daftar tanggal lengkap sesuai jumlah hari dalam bulan
-        $formattedData = collect(range(1, $daysInMonth))->map(function ($day) use ($expenses, $year, $month) {
-            return [
-                'date' => sprintf('%04d-%02d-%02d', $year, $month, $day), // Format YYYY-MM-DD
-                'expense' => $expenses->firstWhere('day', $day)->total_expense ?? 0
-            ];
-        });
-
-        return response()->json($formattedData);
-    }
 
 
 

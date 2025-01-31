@@ -5,6 +5,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { MdOutlineSpaceDashboard, MdOutlineMenu, MdOutlineCategory } from "react-icons/md";
 import { GrTransaction } from "react-icons/gr";
 import { Toaster } from 'sonner';
+import { IoStatsChartOutline } from "react-icons/io5";
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -130,6 +131,9 @@ export default function Authenticated({ user, header, children }) {
                     </Link>
                     <Link href='/transaction' className={`hover:bg-gray-100 px-3 py-2 duration-100 rounded-lg ${isActive('/transaction')}`}>
                         <div className='flex items-center gap-2'><GrTransaction /> Transaksi</div>
+                    </Link>
+                    <Link href='/analytic' className={`hover:bg-gray-100 px-3 py-2 duration-100 rounded-lg ${isActive('/analytic')}`}>
+                        <div className='flex items-center gap-2'><IoStatsChartOutline /> Analisis</div>
                     </Link>
                 </div>
             </div>

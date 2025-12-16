@@ -28,7 +28,7 @@ export default function Authenticated({ user, header, children }) {
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
                                 <Link href="/">
-                                    <h1 className='font-bold text-lg'>Laravel Inertia React</h1>
+                                    <h1 className='font-bold text-lg'>Expense Tracker</h1>
                                 </Link>
                                 <MdOutlineMenu className='lg:text-3xl lg:ml-16 hover:cursor-pointer' onClick={toggleSidebar}/>
                             </div>

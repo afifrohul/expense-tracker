@@ -14,8 +14,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $dodikgl = \App\Models\User::create([
-            'name' => 'User',
-            'email' => 'user@gmail.com',
+            'name' => 'Afif',
+            'email' => 'afif@example.com',
             'email_verified_at' => now(),
             'password' => bcrypt('password'),
             'remember_token' => \Str::random(60),

@@ -25,7 +25,7 @@ class TransactionController extends Controller
         $sortField = $request->input('sort', 'date'); 
         $sortOrder = $request->input('order', 'desc'); 
 
-        $allowedSortFields = ['id', 'description', 'date', 'amount', 'type'];
+        $allowedSortFields = ['id', 'description', 'date', 'amount', 'type', 'category_name'];
         if (!in_array($sortField, $allowedSortFields)) {
             $sortField = 'date';
         }
@@ -37,8 +37,21 @@ class TransactionController extends Controller
             ->orderBy($sortField, $sortOrder)
             ->paginate($perPage);
 
+        $data = collect($transaction->items())->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'description' => $item->description,
+                'date' => $item->date,
+                'amount' => $item->amount,
+                'type' => $item->type,
+
+                'category_id' => $item->category?->id,
+                'category_name' => $item->category?->name,
+            ];
+        });
+
         return response()->json([
-            'data' => $transaction->items(),
+            'data' => $data,
             'total' => $transaction->total(),
             'per_page' => $transaction->perPage(),
             'current_page' => $transaction->currentPage(),

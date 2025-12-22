@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Transaction;
+use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
+
+        $categoryCounts = Category::count();
+        $transactionCounts = Transaction::count();
+
         $totalIncome = Transaction::where('type', 'income')->sum('amount');
         $totalExpense = Transaction::where('type', 'expense')->sum('amount');
         $totalBalance = $totalIncome - $totalExpense;
@@ -55,6 +60,8 @@ class DashboardController extends Controller
         $recentTransaction = Transaction::with('category')->orderBy('date', 'desc')->limit(6)->get();
 
         return Inertia::render('Dashboard', [
+            'category_counts' => $categoryCounts, 
+            'transaction_counts' => $transactionCounts, 
             'total_income' => $totalIncome,
             'total_expense' => $totalExpense,
             'total_balance' => $totalBalance,

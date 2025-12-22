@@ -4,11 +4,13 @@ import React, { useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { formatRupiah } from "./utils";
 import { LuWallet } from "react-icons/lu";
-import { BiCoinStack } from "react-icons/bi";
+import { MdOutlineWavingHand } from "react-icons/md";
 import { RiHandCoinLine } from "react-icons/ri";
 import { LuArrowDownLeft, LuArrowUpRight } from "react-icons/lu";
 import { BsBoxArrowInUpRight } from "react-icons/bs";
 import { RiCoinsLine } from "react-icons/ri";
+import { GiMoneyStack } from "react-icons/gi";
+import { IoCalendarOutline, IoTimeOutline } from "react-icons/io5";
 import {
     BarChart,
     Bar,
@@ -23,9 +25,13 @@ import {
 } from "recharts";
 import axios from "axios";
 import { BsArrowUpRightCircle, BsArrowDownLeftCircle } from "react-icons/bs";
+import { MdOutlineCategory } from "react-icons/md";
+import { GrTransaction } from "react-icons/gr";
 
 export default function Dashboard({
     auth,
+    category_counts,
+    transaction_counts,
     total_income,
     total_expense,
     total_balance,
@@ -100,84 +106,158 @@ export default function Dashboard({
 
             <div className="flex gap-4">
                 <div className="flex-1 flex flex-col gap-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 text-slate-500 rounded-lg border border-slate-400 py-12">
-                            <h1 className="text-2xl font-mono font-semibold">
-                                {now}
-                            </h1>
+                    <div className="grid grid-cols-5 gap-4">
+                        <div className="border border-slate-400 p-4 rounded-lg col-span-3">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-center w-10 h-10 border border-cyan-300 bg-cyan-100 rounded-full">
+                                    <MdOutlineWavingHand className="text-cyan-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        Selamat Datang di Dashboard,{" "}
+                                        {auth.user.name}!
+                                    </p>
+                                    <p className="text-xs">
+                                        Pantau pengeluaran Anda, analisis pola
+                                        belanja Anda, dan rencanakan dengan
+                                        lebih cerdas.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 text-slate-500 rounded-lg border border-slate-400 py-12">
-                            <h1 className="text-3xl font-mono font-semibold">
-                                {formatTime(time)} WIB
-                            </h1>
+                        <div className="flex justify-center items-center border border-slate-400 p-4 rounded-lg col-span-2">
+                            <div className="flex gap-8 ">
+                                <div className="flex gap-2 items-center">
+                                    <IoCalendarOutline></IoCalendarOutline>
+                                    <h1 className="italic ">{now}</h1>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                    <IoTimeOutline></IoTimeOutline>
+                                    <h1 className="italic ">
+                                        {formatTime(time)} WIB
+                                    </h1>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div className="flex gap-4">
-                        <div className="border border-slate-300 rounded-lg w-fit p-4 flex flex-col gap-2">
-                            <div className="mb-2">
-                                <p className="font-bold text-xl">
-                                    Informasi Saldo
-                                </p>
-                                <hr className="mt-2" />
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <LuWallet className="text-blue-800 text-2xl" />
-                                <p className="font-semibold">
-                                    Saldo tersedia:{" "}
-                                    <span className="text-green-600">
-                                        {formatRupiah(total_balance)}
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <BiCoinStack className="text-blue-800 text-2xl" />
-                                <p className="font-semibold">
-                                    Total pemasukan:{" "}
-                                    <span className="text-blue-700 font-normal">
-                                        {formatRupiah(total_income)}
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <RiHandCoinLine className="text-blue-800 text-2xl" />
-                                <p className="font-semibold">
-                                    Total pengeluaran:{" "}
-                                    <span className="text-blue-700 font-normal">
-                                        {formatRupiah(total_expense)}
-                                    </span>
-                                </p>
-                            </div>
-
-                            <hr className="my-4" />
-                            <div className="flex gap-2 items-center">
-                                <LuArrowDownLeft className="text-green-600 text-2xl" />
-                                <p className="font-semibold">
-                                    Total pemasukan (Bulan ini):{" "}
-                                    <span className="font-normal">
-                                        {formatRupiah(monthly_income)}
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <LuArrowUpRight className="text-red-600 text-2xl" />
-                                <p className="font-semibold">
-                                    Total pengeluaran (Bulan ini):{" "}
-                                    <span className="font-normal">
-                                        {formatRupiah(monthly_expense)}
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <RiCoinsLine className="text-yellow-500 text-2xl" />
-                                <p className="font-semibold">
-                                    Selisih:{" "}
-                                    <span className="font-semibold text-teal-600">
-                                        {formatRupiah(monthly_difference)}
-                                    </span>
-                                </p>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-300 flex justify-center items-center">
+                                    <MdOutlineCategory className="text-xl text-indigo-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {category_counts}
+                                    </p>
+                                    <p className="text-xs">Total Kategori</p>
+                                </div>
                             </div>
                         </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-sky-100 border border-sky-300 flex justify-center items-center">
+                                    <GrTransaction className="text-xl text-sky-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {transaction_counts}
+                                    </p>
+                                    <p className="text-xs">Total Transaksi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-teal-100 border border-teal-300 flex justify-center items-center">
+                                    <LuWallet className="text-xl text-teal-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(total_balance)}
+                                    </p>
+                                    <p className="text-xs">Saldo Tersedia</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-green-100 border border-green-300 flex justify-center items-center">
+                                    <GiMoneyStack className="text-xl text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(total_income)}
+                                    </p>
+                                    <p className="text-xs">Total Pemasukan</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-rose-100 border border-rose-300 flex justify-center items-center">
+                                    <RiHandCoinLine className="text-xl text-rose-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(total_expense)}
+                                    </p>
+                                    <p className="text-xs">Total Pengeluaran</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-teal-100 border border-teal-300 flex justify-center items-center">
+                                    <RiCoinsLine className="text-xl text-teal-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(monthly_difference)}
+                                    </p>
+                                    <p className="text-xs">
+                                        Saldo Tersedia Bulan Ini
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-green-100 border border-green-300 flex justify-center items-center">
+                                    <LuArrowDownLeft className="text-xl text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(monthly_income)}
+                                    </p>
+                                    <p className="text-xs">
+                                        Total Pemasukan Bulan Ini
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
+                            <div className="flex items-center w-full gap-4">
+                                <div className="w-10 h-10 rounded-full bg-rose-100 border border-rose-300 flex justify-center items-center">
+                                    <LuArrowUpRight className="text-xl text-rose-600" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">
+                                        {formatRupiah(monthly_expense)}
+                                    </p>
+                                    <p className="text-xs">
+                                        Total Pengeluaran Bulan Ini
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
                         <div className="border border-slate-300 p-4 rounded-lg w-full">
                             <div className="w-full">
                                 <select

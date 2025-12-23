@@ -319,8 +319,6 @@ export default function Transaction({ auth, all_category }) {
         },
     ];
 
-    console.log(data);
-
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Transaksi" />

@@ -20,13 +20,12 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
-    LineChart,
-    Line,
 } from "recharts";
 import axios from "axios";
 import { BsArrowUpRightCircle, BsArrowDownLeftCircle } from "react-icons/bs";
 import { MdOutlineCategory } from "react-icons/md";
 import { GrTransaction } from "react-icons/gr";
+import DashboardCard from "@/Components/DashboardCard";
 
 export default function Dashboard({
     auth,
@@ -142,119 +141,76 @@ export default function Dashboard({
                     </div>
 
                     <div className="flex gap-4">
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-indigo-100 border border-indigo-300 flex justify-center items-center">
-                                    <MdOutlineCategory className="text-xl text-indigo-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {category_counts}
-                                    </p>
-                                    <p className="text-xs">Total Kategori</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-sky-100 border border-sky-300 flex justify-center items-center">
-                                    <GrTransaction className="text-xl text-sky-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {transaction_counts}
-                                    </p>
-                                    <p className="text-xs">Total Transaksi</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-teal-100 border border-teal-300 flex justify-center items-center">
-                                    <LuWallet className="text-xl text-teal-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(total_balance)}
-                                    </p>
-                                    <p className="text-xs">Saldo Tersedia</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-green-100 border border-green-300 flex justify-center items-center">
-                                    <GiMoneyStack className="text-xl text-green-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(total_income)}
-                                    </p>
-                                    <p className="text-xs">Total Pemasukan</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4 flex-1">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-rose-100 border border-rose-300 flex justify-center items-center">
-                                    <RiHandCoinLine className="text-xl text-rose-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(total_expense)}
-                                    </p>
-                                    <p className="text-xs">Total Pengeluaran</p>
-                                </div>
-                            </div>
-                        </div>
+                        <DashboardCard
+                            color="indigo"
+                            icon={
+                                <MdOutlineCategory className="text-xl text-indigo-600" />
+                            }
+                            data={category_counts}
+                            desc="Total Kategori"
+                        />
+                        <DashboardCard
+                            color="sky"
+                            icon={
+                                <GrTransaction className="text-xl text-sky-600" />
+                            }
+                            data={transaction_counts}
+                            desc="Total Transaksi"
+                        />
+                        <DashboardCard
+                            color="teal"
+                            icon={
+                                <LuWallet className="text-xl text-teal-600" />
+                            }
+                            data={formatRupiah(total_balance)}
+                            desc="Saldo Tersedia"
+                            className={"flex-1"}
+                        />
+                        <DashboardCard
+                            color="green"
+                            icon={
+                                <GiMoneyStack className="text-xl text-green-600" />
+                            }
+                            data={formatRupiah(total_income)}
+                            desc="Total Pemasukan"
+                            className={"flex-1"}
+                        />
+                        <DashboardCard
+                            color="rose"
+                            icon={
+                                <RiHandCoinLine className="text-xl text-rose-600" />
+                            }
+                            data={formatRupiah(total_expense)}
+                            desc="Total Pengeluaran"
+                            className={"flex-1"}
+                        />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-teal-100 border border-teal-300 flex justify-center items-center">
-                                    <RiCoinsLine className="text-xl text-teal-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(monthly_difference)}
-                                    </p>
-                                    <p className="text-xs">
-                                        Saldo Tersedia Bulan Ini
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-green-100 border border-green-300 flex justify-center items-center">
-                                    <LuArrowDownLeft className="text-xl text-green-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(monthly_income)}
-                                    </p>
-                                    <p className="text-xs">
-                                        Total Pemasukan Bulan Ini
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-cente rounded-lg border border-slate-400 p-4">
-                            <div className="flex items-center w-full gap-4">
-                                <div className="w-10 h-10 rounded-full bg-rose-100 border border-rose-300 flex justify-center items-center">
-                                    <LuArrowUpRight className="text-xl text-rose-600" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm">
-                                        {formatRupiah(monthly_expense)}
-                                    </p>
-                                    <p className="text-xs">
-                                        Total Pengeluaran Bulan Ini
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <DashboardCard
+                            color="teal"
+                            icon={
+                                <RiCoinsLine className="text-xl text-teal-600" />
+                            }
+                            data={formatRupiah(monthly_difference)}
+                            desc="Saldo Tersedia Bulan Ini"
+                        />
+                        <DashboardCard
+                            color="green"
+                            icon={
+                                <LuArrowDownLeft className="text-xl text-green-600" />
+                            }
+                            data={formatRupiah(monthly_income)}
+                            desc="Total Pemasukan Bulan Ini"
+                        />
+                        <DashboardCard
+                            color="rose"
+                            icon={
+                                <LuArrowUpRight className="text-xl text-rose-600" />
+                            }
+                            data={formatRupiah(monthly_expense)}
+                            desc="Total Pengeluaran Bulan Ini"
+                        />
                     </div>
 
                     <div className="flex gap-4">
